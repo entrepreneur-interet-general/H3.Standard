@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Authors>Shom, Arnaud Ménard</Authors>
+    <Company>Shom</Company>
+    <Description>c# binding of the H3 Index by Uber
+
+1.0.0 package version is linked to Uber H3 C lib version 3.1.0
+3.2.0 package version is linked to Uber H3 C lib version 3.2.0</Description>
+    <Copyright>2018 Shom, Arnaud Ménard</Copyright>
+    <AssemblyVersion>3.2.0.0</AssemblyVersion>
+    <FileVersion>3.2.0.0</FileVersion>
+    <PackageTags>H3</PackageTags>
+    <PackageId>H3</PackageId>
+    <Product>H3</Product>
+    <Version>3.2.0</Version>
+    <PackageLicenseUrl />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="h3lib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="h3lib.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+	<Import Project="H3.3.2.0.targets" Condition="Exists('H3.3.2.0.targets')" />
+
+</Project>
