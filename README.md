@@ -21,7 +21,7 @@ Available versions are:
 
 This package embeds the 3.2.0 H3 C library as a resource.
 H3.InstanciateNativeLibrary() has to be called first. It will copy the h3lib.dll into the output directory.
-This is a workaround for pack native dlls within a nuget package.
+This is a workaround for packing native dlls within a nuget package.
 
 - 1.0.0 Bindings to Uber C library version 3.1.0
 
