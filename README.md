@@ -29,7 +29,7 @@ This package does not embed the corresponding native c library within the packag
 It has to be build and added separately
 
 ## Prerequisites
-Windows: .NET 4.6.1+
+Windows: .NET Standard 2.0
 
 ## H3 3.2.0 Support
 
