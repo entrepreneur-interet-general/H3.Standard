@@ -10,9 +10,9 @@ Documentation of the C library is available at [https://uber.github.io/h3/](http
 
 This c# binding is available as a Nuget package [here](https://www.nuget.org/packages/H3/). 
 
-...
+```
 PM > Install-Package H3 -Version 3.2.0-alpha
-...
+```
 
 ### Versions
 
@@ -31,6 +31,14 @@ It has to be build and added separately
 ## Prerequisites
 Windows: .NET 4.6.1+
 
+## H3 3.2.0 Support
+
+All H3 functions are available EXCEPT the experimental ones:
+
+```
+experimentalH3ToLocalIj)(H3Index origin, H3Index h3, CoordIJ *out);
+experimentalLocalIjToH3)(H3Index origin, const CoordIJ *ij, H3Index *out);
+```
 
 ## Legal and Licensing
 
