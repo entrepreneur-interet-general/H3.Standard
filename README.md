@@ -8,7 +8,7 @@ Documentation of the C library is available at [https://uber.github.io/h3/](http
 
 ## Nuget
 
-This c# binding is available as a Nuget package here [nuget.org](https://www.nuget.org/packages/H3/). 
+This c# binding is available as a Nuget package [here](https://www.nuget.org/packages/H3/). 
 
 ...
 PM > Install-Package H3 -Version 3.2.0-alpha
