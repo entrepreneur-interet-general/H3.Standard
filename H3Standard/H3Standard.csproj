@@ -21,12 +21,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="h3lib.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="h3lib.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

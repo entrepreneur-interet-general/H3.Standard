@@ -11,13 +11,13 @@ Documentation of the C library is available at [https://uber.github.io/h3/](http
 This c# binding is available as a Nuget package [here](https://www.nuget.org/packages/H3/). 
 
 ```
-PM > Install-Package H3 -Version 3.2.0-beta
+PM > Install-Package H3 -Version 3.2.1-rc
 ```
 
 ### Versions
 
 Available versions are:
-- 3.2.0-beta  Bindings to Uber C library version 3.2.0
+- 3.2.1-rc  Bindings to Uber C library version 3.2.0
 
 This package includes the 3.2.0 version of the native C library.
 
