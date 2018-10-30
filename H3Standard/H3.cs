@@ -445,7 +445,7 @@ namespace H3Standard
             return deg * Math.PI / 180;
         }
 
-        public static double RadToDeg(double rad, bool normalize = false)
+        public static double RadToDeg(double rad)
         {
             var val = rad * 180 / Math.PI;
             if (val > 180) val = val - 360;
@@ -498,25 +498,25 @@ namespace H3Standard
         private static GeoCoord[] Normalize(H3GeoBoundary geoBoundary)
         {
             geoBoundary.verts0.latitude = RadToDeg(geoBoundary.verts0.latitude);
-            geoBoundary.verts0.longitude = RadToDeg(geoBoundary.verts0.longitude, true);
+            geoBoundary.verts0.longitude = RadToDeg(geoBoundary.verts0.longitude);
             geoBoundary.verts1.latitude = RadToDeg(geoBoundary.verts1.latitude);
-            geoBoundary.verts1.longitude = RadToDeg(geoBoundary.verts1.longitude, true);
+            geoBoundary.verts1.longitude = RadToDeg(geoBoundary.verts1.longitude);
             geoBoundary.verts2.latitude = RadToDeg(geoBoundary.verts2.latitude);
-            geoBoundary.verts2.longitude = RadToDeg(geoBoundary.verts2.longitude, true);
+            geoBoundary.verts2.longitude = RadToDeg(geoBoundary.verts2.longitude);
             geoBoundary.verts3.latitude = RadToDeg(geoBoundary.verts3.latitude);
-            geoBoundary.verts3.longitude = RadToDeg(geoBoundary.verts3.longitude, true);
+            geoBoundary.verts3.longitude = RadToDeg(geoBoundary.verts3.longitude);
             geoBoundary.verts4.latitude = RadToDeg(geoBoundary.verts4.latitude);
-            geoBoundary.verts4.longitude = RadToDeg(geoBoundary.verts4.longitude, true);
+            geoBoundary.verts4.longitude = RadToDeg(geoBoundary.verts4.longitude);
             geoBoundary.verts5.latitude = RadToDeg(geoBoundary.verts5.latitude);
-            geoBoundary.verts5.longitude = RadToDeg(geoBoundary.verts5.longitude, true);
+            geoBoundary.verts5.longitude = RadToDeg(geoBoundary.verts5.longitude);
             geoBoundary.verts6.latitude = RadToDeg(geoBoundary.verts6.latitude);
-            geoBoundary.verts6.longitude = RadToDeg(geoBoundary.verts6.longitude, true);
+            geoBoundary.verts6.longitude = RadToDeg(geoBoundary.verts6.longitude);
             geoBoundary.verts7.latitude = RadToDeg(geoBoundary.verts7.latitude);
-            geoBoundary.verts7.longitude = RadToDeg(geoBoundary.verts7.longitude, true);
+            geoBoundary.verts7.longitude = RadToDeg(geoBoundary.verts7.longitude);
             geoBoundary.verts8.latitude = RadToDeg(geoBoundary.verts8.latitude);
-            geoBoundary.verts8.longitude = RadToDeg(geoBoundary.verts8.longitude, true);
+            geoBoundary.verts8.longitude = RadToDeg(geoBoundary.verts8.longitude);
             geoBoundary.verts9.latitude = RadToDeg(geoBoundary.verts9.latitude);
-            geoBoundary.verts9.longitude = RadToDeg(geoBoundary.verts9.longitude, true);
+            geoBoundary.verts9.longitude = RadToDeg(geoBoundary.verts9.longitude);
             List<GeoCoord> geoCoords = new List<GeoCoord>();
             if (geoBoundary.verts0.latitude != 0 && geoBoundary.verts0.longitude != 0)
             {
