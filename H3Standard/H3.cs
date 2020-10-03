@@ -51,8 +51,10 @@ namespace H3Standard
 
         private static bool _libInstanciateDone = false;
 
-        private H3()
-        {}
+        static H3()
+        {
+            InstanciateNativeLibrary();
+        }
 
         #region H3 static extern declarations
 
