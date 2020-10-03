@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace H3Standard
@@ -12,7 +13,12 @@ namespace H3Standard
     {
         private H3Lib()
         {
-            UnpackNativeLibrary("h3lib");
+            var libraryName = "h3lib.dll";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                libraryName = "h3lib.dll.so";
+            }
+            UnpackNativeLibrary(libraryName);
         }
 
         public void Check()
@@ -30,13 +36,13 @@ namespace H3Standard
         private static void UnpackNativeLibrary(string libraryName)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            string resourceName = $"{assembly.GetName().Name}.{libraryName}.dll";
+            string resourceName = $"{assembly.GetName().Name}.{libraryName}";
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             using (var memoryStream = new MemoryStream(stream.CanSeek ? (int)stream.Length : 0))
             {
                 stream.CopyTo(memoryStream);
-                File.WriteAllBytes($"{libraryName}.dll", memoryStream.ToArray());
+                File.WriteAllBytes(libraryName, memoryStream.ToArray());
             }
         }
     }
