@@ -30,13 +30,13 @@ namespace H3Standard
         private static void UnpackNativeLibrary(string libraryName)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            string resourceName = $"{assembly.GetName().Name}.{libraryName}.dll";
+            string resourceName = $"{assembly.GetName().Name}.{libraryName}";
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             using (var memoryStream = new MemoryStream(stream.CanSeek ? (int)stream.Length : 0))
             {
                 stream.CopyTo(memoryStream);
-                File.WriteAllBytes($"{libraryName}.dll", memoryStream.ToArray());
+                File.WriteAllBytes(libraryName, memoryStream.ToArray());
             }
         }
 
@@ -44,7 +44,12 @@ namespace H3Standard
         {
             if (!_libInstanciateDone)
             {
-                UnpackNativeLibrary("h3lib");
+                var libraryName = "h3lib.dll";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    libraryName = "h3lib.dll.so";
+                }
+                UnpackNativeLibrary(libraryName);
             }
             _libInstanciateDone = true;
         }
