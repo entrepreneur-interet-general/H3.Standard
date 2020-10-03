@@ -39,9 +39,4 @@
   </ItemGroup>
 
 	<Import Project="H3.3.2.0.targets" Condition="Exists('H3.3.2.0.targets')" />
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="copy h3lib.dll $(TargetPath)" />
-	</Target>
-
 </Project>
