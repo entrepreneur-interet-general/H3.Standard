@@ -6,37 +6,23 @@ H3 is a geospatial indexing system using a hexagonal grid.
 
 Documentation of the C library is available at [https://uber.github.io/h3/](https://uber.github.io/h3/).
 
-## Nuget
+### Version
 
-This c# binding is available as a Nuget package [here](https://www.nuget.org/packages/H3/). 
+Bindings to Uber C library version 3.7.2.1
 
-```
-PM > Install-Package H3 -Version 3.2.1-rc
-```
-
-### Versions
-
-Available versions are:
-- 3.2.1-rc  Bindings to Uber C library version 3.2.0
-
-This package includes the 3.2.0 version of the native C library.
-
-- 1.0.0 Bindings to Uber C library version 3.1.0
-
-This package does not embed the corresponding native c library within the package.
+This project does not embed the corresponding native c library.
 It has to be build and added separately.
 
 ## Prerequisites
-Windows: .NET Standard 2.0
+.NET Standard 2.0
 
-## H3 3.2.0 Support
+A _WINDOWS pragma directive has been defined to target the right name for the underlying H3 c lib, h3 in case of *Nix platforms, h3.dll in case of Windows platforms.
 
-All H3 functions are available EXCEPT the experimental ones:
+## H3 - 3.7.2.1 Support
 
-```
-experimentalH3ToLocalIj(H3Index origin, H3Index h3, CoordIJ *out);
-experimentalLocalIjToH3(H3Index origin, const CoordIJ *ij, H3Index *out);
-```
+All H3 C functions are accessible via a simple wrapping, with the exact same c-style name (camel-casing).
+
+Most of the H3 functions have a dotnet-style wrapper helper where out params and pre-array dimensioning are avoided.
 
 ## Legal and Licensing
 

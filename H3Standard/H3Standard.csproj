@@ -8,28 +8,28 @@
     <Company>Shom</Company>
     <Description>c# binding of the H3 Index by Uber
 
-1.0.0 package version is linked to Uber H3 C lib version 3.1.0
-3.2.0 package version is linked to Uber H3 C lib version 3.2.0</Description>
+3.7.2.1 package version is linked to Uber H3 C lib version 3.7.2.1</Description>
     <Copyright>2018 Shom, Arnaud Ménard</Copyright>
-    <AssemblyVersion>3.2.0.0</AssemblyVersion>
-    <FileVersion>3.2.0.0</FileVersion>
+    <AssemblyVersion>3.7.2.1</AssemblyVersion>
+    <FileVersion>3.7.2.1</FileVersion>
     <PackageTags>H3</PackageTags>
     <PackageId>H3</PackageId>
     <Product>H3</Product>
-    <Version>3.2.0</Version>
+    <Version>3.7.2.1</Version>
     <PackageLicenseUrl />
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="h3lib.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Remove="h3lib.dll" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="H3LibInstanciate.cs" />
+  </ItemGroup>
 	<Import Project="H3.3.2.0.targets" Condition="Exists('H3.3.2.0.targets')" />
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="copy h3lib.dll $(TargetPath)" />
-	</Target>
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <DefineConstants>_WINDOWS</DefineConstants>
+  </PropertyGroup>
 
 </Project>

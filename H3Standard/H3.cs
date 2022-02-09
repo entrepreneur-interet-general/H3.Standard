@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Shom, Arnaud Ménard
+ * Copyright 2018 - 2022, Shom, Arnaud Ménard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,180 +24,217 @@ using System.Runtime.InteropServices;
 
 namespace H3Standard
 {
-    public class H3
+    public static class H3
     {
 
-        private static void UnpackNativeLibrary(string libraryName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            string resourceName = $"{assembly.GetName().Name}.{libraryName}.dll";
-
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
-            using (var memoryStream = new MemoryStream(stream.CanSeek ? (int)stream.Length : 0))
-            {
-                stream.CopyTo(memoryStream);
-                File.WriteAllBytes($"{libraryName}.dll", memoryStream.ToArray());
-            }
-        }
-
-        public static void InstanciateNativeLibrary()
-        {
-            if (!_libInstanciateDone)
-            {
-                UnpackNativeLibrary("h3lib");
-            }
-            _libInstanciateDone = true;
-        }
-
-        private static bool _libInstanciateDone = false;
-
-        private H3()
-        {}
+#if _WINDOWS
+        private const string LIBRARY_NAME = "h3.dll";
+#else
+        private const string LIBRARY_NAME = "h3";
+#endif
 
         #region H3 static extern declarations
 
-        // INDEXING : https://uber.github.io/h3/#/documentation/api-reference/indexing
+        // INDEXING : https://uber.github.io/h3/#/documentation/api-reference/indexing, https://h3geo.org/docs/api/indexing
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong geoToH3(ref H3GeoCoord g, int res);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong geoToH3(ref H3GeoCoord g, int res);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl )]
-        private static extern void h3ToGeo( ulong h3, ref H3GeoCoord g);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl )]
+        public static extern void h3ToGeo( ulong h3, ref H3GeoCoord g);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void h3ToGeoBoundary(ulong h3, ref H3GeoBoundary gp);
-
-
-        // INSPECTION : https://uber.github.io/h3/#/documentation/api-reference/inspection
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3GetResolution(ulong h3);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3GetBaseCell(ulong h);
-
-        // stringToH3
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void h3ToString(ulong h3Index, byte[] s, int size);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3IsValid(ulong h);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3IsResClassIII(ulong h);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3IsPentagon(ulong h);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void h3ToGeoBoundary(ulong h3, ref H3GeoBoundary gp);
 
 
-        // NEIGHBOURS : https://uber.github.io/h3/#/documentation/api-reference/neighbors
+        // INSPECTION : https://uber.github.io/h3/#/documentation/api-reference/inspection, https://h3geo.org/docs/api/inspection
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void kRing(ulong origin, int k, ulong[] neighbours);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3GetResolution(ulong h3);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int maxKringSize(int k);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3GetBaseCell(ulong h);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void kRingDistances(ulong origin, int k, ulong[] neighbours, int[] distances);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong stringToH3(byte[] s);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int hexRange(ulong origin, int k, ulong[] neighbours);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void h3ToString(ulong h3Index, byte[] s, int size);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int hexRangeDistances(ulong origin, int k, ulong[] neighbours, int[] distances);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3IsValid(ulong h);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int hexRanges(ulong[] h3Set, int length, int k, ulong[] neighbours);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3IsResClassIII(ulong h);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int hexRing(ulong origin, int k, ulong[] neighbours);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3IsPentagon(ulong h);
 
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void h3GetFaces(ulong h, int[] faces);
 
-        // DISTANCE: https://uber.github.io/h3/#/documentation/api-reference/distance
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3Distance(ulong origin, ulong h3);
-
-
-        // HIERARCHY : https://uber.github.io/h3/#/documentation/api-reference/hierarchy
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong h3ToParent(ulong index, int parentRes);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void h3ToChildren(ulong h, int childRes, ulong[] children);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int maxH3ToChildrenSize(ulong h, int childRes);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int compact(ulong[] h3Set, ulong[] compactedSet, int numHexes);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int uncompact(ulong[] compactedSet, int numHexes, ulong[] h3Set, int maxHexes, int res );
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int maxUncompactSize( ulong[] compactedSet, int numHexes, int res);
-
-        // REGION : https://uber.github.io/h3/#/documentation/api-reference/regions
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void polyfill(ref H3GeoPolygon polygon, int res, ulong[] index);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int maxPolyfillSize(ref H3GeoPolygon polygon, int res);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void h3SetToLinkedGeo(ulong[] h3Set, int numHexes, H3LinkedGeoPolygon[] linkedGeos);
-
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void destroyLinkedPolygon(H3LinkedGeoPolygon[] polygon);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int maxFaceCount(ulong h);
 
 
-        // UNIDIRECTIONAL EDGES : https://uber.github.io/h3/#/documentation/api-reference/unidirectional-edges
+        // TRAVERSAL : https://uber.github.io/h3/#/documentation/api-reference/neighbors, https://h3geo.org/docs/api/traversal
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3IndexesAreNeighbors(ulong origin, ulong destination);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void kRing(ulong origin, int k, ulong[] neighbours);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong getH3UnidirectionalEdge(ulong origin, ulong destination);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int maxKringSize(int k);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3UnidirectionalEdgeIsValid(ulong edge);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void kRingDistances(ulong origin, int k, ulong[] neighbours, int[] distances);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong getOriginH3IndexFromUnidirectionalEdge(ulong edge);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int hexRange(ulong origin, int k, ulong[] neighbours);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong getDestinationH3IndexFromUnidirectionalEdge(ulong edge);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int hexRangeDistances(ulong origin, int k, ulong[] neighbours, int[] distances);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void getH3IndexesFromUnidirectionalEdge(ulong edge, ulong[] originDestination);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int hexRanges(ulong[] h3Set, int length, int k, ulong[] neighbours);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void getH3UnidirectionalEdgesFromHexagon(ulong origin, ulong[] edges);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int hexRing(ulong origin, int k, ulong[] neighbours);
 
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void getH3UnidirectionalEdgeBoundary(ulong edge, H3GeoBoundary[] gb);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3Line(ulong start, ulong end, ulong[] line);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3LineSize(ulong start, ulong end);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3Distance(ulong origin, ulong h3);
 
 
-        // MISCELLANEOUS : https://uber.github.io/h3/#/documentation/api-reference/miscellaneous
+        // HIERARCHY : https://uber.github.io/h3/#/documentation/api-reference/hierarchy, https://h3geo.org/docs/api/hierarchy
 
-        // degsToRad
-        // radsToDeg
-        // hexAreaKm2
-        // hexAreaM2
-        // edgeLengthKm
-        // edgeLengthM
-        // numHexagons
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong h3ToParent(ulong index, int parentRes);
 
-        // IJK
-        [DllImport("h3lib.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int h3ToIjk(ulong origin, ulong h3, CoordIJK ijk);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void h3ToChildren(ulong h, int childRes, ulong[] children);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int maxH3ToChildrenSize(ulong h, int childRes);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int compact(ulong[] h3Set, ulong[] compactedSet, int numHexes);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int uncompact(ulong[] compactedSet, int numHexes, ulong[] h3Set, int maxHexes, int res );
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int maxUncompactSize( ulong[] compactedSet, int numHexes, int res);
+
+
+        // REGION : https://uber.github.io/h3/#/documentation/api-reference/regions, https://h3geo.org/docs/api/regions
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void polyfill(ref H3GeoPolygon polygon, int res, ulong[] index);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int maxPolyfillSize(ref H3GeoPolygon polygon, int res);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void h3SetToLinkedGeo(ulong[] h3Set, int numHexes, H3LinkedGeoPolygon[] linkedGeos);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void destroyLinkedPolygon(H3LinkedGeoPolygon[] polygon);
+
+
+        // UNIDIRECTIONAL EDGES : https://uber.github.io/h3/#/documentation/api-reference/unidirectional-edges, https://h3geo.org/docs/api/uniedge
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3IndexesAreNeighbors(ulong origin, ulong destination);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong getH3UnidirectionalEdge(ulong origin, ulong destination);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int h3UnidirectionalEdgeIsValid(ulong edge);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong getOriginH3IndexFromUnidirectionalEdge(ulong edge);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong getDestinationH3IndexFromUnidirectionalEdge(ulong edge);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void getH3IndexesFromUnidirectionalEdge(ulong edge, ulong[] originDestination);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void getH3UnidirectionalEdgesFromHexagon(ulong origin, ulong[] edges);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void getH3UnidirectionalEdgeBoundary(ulong edge, H3GeoBoundary[] gb);
+
+
+        // MISCELLANEOUS : https://uber.github.io/h3/#/documentation/api-reference/miscellaneous, https://h3geo.org/docs/api/misc
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double degsToRad(double degrees);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double radsToDeg(double radians);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double hexAreaKm2(int res);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double hexAreaM2(int res);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double cellAreaM2(ulong h);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double cellAreaRads2(ulong h);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double edgeLengthKm(int res);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double edgeLengthM(int res);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double exactEdgeLengthKm(ulong h);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double exactEdgeLengthM(ulong h);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double exactEdgeLengthRads(ulong h);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong numHexagons(int res);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void getRes0Indexes(ulong[] hexagons);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int res0IndexCount();
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void getPentagonIndexes(int res, ulong[] hexagons);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void pentagonIndexCount();
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double pointDistKm(ref GeoCoord a, ref GeoCoord b);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double pointDistM(ref GeoCoord a, ref GeoCoord b);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double pointDistRads(ref GeoCoord a, ref GeoCoord b);
 
         #endregion
+
+        #region .Net Style H3 Methods
 
         // INDEXING 
 
@@ -207,69 +244,11 @@ namespace H3Standard
             return geoToH3(ref coord, resolution);
         }
 
-        public static string H3ToString(ulong index)
+        public static GeoCoord H3ToGeo(ulong h)
         {
-            return string.Format("{0}", index.ToString("x"));
-        }
-
-        public static ulong StringToH3(string index)
-        {
-            return Convert.ToUInt64(index, 16);
-        }
-
-
-        public static int IsValid(ulong h)
-        {
-            return h3IsValid(h);
-        }
-
-        public static bool IsResClassIII(ulong h)
-        {
-            return h3IsResClassIII(h) != 0;
-        }
-
-        public static bool IsPentagon(ulong h)
-        {
-            return h3IsPentagon(h) != 0;
-        }
-
-        public static int GetResolution(string h3)
-        {
-            return h3GetResolution(StringToH3(h3));
-        }
-
-        public static int GetResolution(ulong h3)
-        {
-            return h3GetResolution(h3);
-        }
-
-        public static int GetBaseCell(ulong h3)
-        {
-            return h3GetBaseCell(h3);
-        }
-
-        public static ulong H3ToParent(ulong index, int parentResolution = 0)
-        {
-            if (parentResolution == 0)
-            {
-                parentResolution = GetResolution(index) - 1;
-            }
-            return h3ToParent(index, parentResolution);
-        }
-
-        public static ulong H3ToParent(string index, int parentResolution = 0)
-        {
-            return H3ToParent(StringToH3(index), parentResolution);
-        }
-
-        public static int H3Distance(ulong origin, ulong index)
-        {
-            return h3Distance(origin, index);
-        }
-
-        public static int H3Distance(string origin, string index)
-        {
-            return H3Distance(StringToH3(origin), StringToH3(index));
+            H3GeoCoord geoCoord = new H3GeoCoord();
+            h3ToGeo(h, ref geoCoord);
+            return new GeoCoord( geoCoord );
         }
 
         public static GeoCoord[] H3ToGeoBoundary(string key)
@@ -283,193 +262,6 @@ namespace H3Standard
             geoBoundary.numVerts = 10;
             h3ToGeoBoundary(h3Index, ref geoBoundary);
             return Normalize(geoBoundary);
-        }
-
-        public static (double latitude, double longitude) GetCenter(ulong index)
-        {
-            H3GeoCoord geoCoord = new H3GeoCoord();
-            h3ToGeo(index, ref geoCoord);
-            if (geoCoord.lon > 180) geoCoord.lon -= 360;
-            GeoCoord coords = new GeoCoord(geoCoord);
-            return (coords.latitude, coords.longitude);
-        }
-
-        public static H3GeoBoundary[] GetEdgeBoundary(ulong index)
-        {
-            var boundaries = new H3GeoBoundary[2];
-            getH3UnidirectionalEdgeBoundary(index, boundaries);
-            return boundaries;
-        }
-
-        // Needs System.ValueTuple to compile --> Nuget
-        public static (ulong origin, ulong destination) GetOriginAndDestination(ulong edgeIndex)
-        {
-            ulong[] indexes = new ulong[2];
-            getH3IndexesFromUnidirectionalEdge(edgeIndex, indexes);
-            return (indexes[0], indexes[1]);
-        }
-
-        public static ulong[] GetEdges(ulong h3Index)
-        {
-            ulong[] edges = new ulong[6];
-            getH3UnidirectionalEdgesFromHexagon(h3Index, edges);
-            return edges;
-        }
-
-        public static ulong[] GetKRing(ulong origin, int k)
-        {
-            int nbHex = maxKringSize(k);
-            ulong[] neighbours = new ulong[nbHex];
-            int result = hexRange(origin, k, neighbours);
-            return neighbours;
-        }
-
-        public static ulong[] GetHexRange(ulong origin, int k)
-        {
-            int nbHex = maxKringSize(k);
-            ulong[] neighbours = new ulong[nbHex];
-            int result = hexRange(origin, k, neighbours);
-            return neighbours;
-        }
-
-        public static ulong[] GetHexRing(ulong origin, int k)
-        {
-            int nbHex = maxKringSize(k);
-            ulong[] neighbours = new ulong[nbHex];
-            int result = hexRing(origin, k, neighbours);
-            return neighbours;
-        }
-
-        public static ulong GetDestination(ulong edge )
-        {
-            return getDestinationH3IndexFromUnidirectionalEdge(edge);
-        }
-
-        public static ulong GetOrigin(ulong edge)
-        {
-            return getOriginH3IndexFromUnidirectionalEdge(edge);
-        }
-
-        public static ulong[] GetChildren(string hexIndex, int childResolution)
-        {
-            return GetChildren(StringToH3(hexIndex), childResolution);
-        }
-
-        public static ulong[] GetChildren(ulong index, int childResolution = 0)
-        {
-            ulong[] children = null;
-            if (childResolution == 0)
-            {
-                childResolution = GetResolution(index) + 1;
-            }
-            int nbChildren = maxH3ToChildrenSize(index, childResolution);
-            children = new ulong[nbChildren + 1];
-            h3ToChildren( index, childResolution, children );
-            return children;
-        }
-
-        public static ulong[] Polyfill(List<GeoCoord> coords, int resolution)
-        {
-            ulong[] index = null;
-            int nbIndex = MaxPolyfillSize(coords, resolution );
-            var h3Coords = FromGeoCoords(coords);
-            H3GeoPolygon polygon = new H3GeoPolygon();
-            polygon.geofence = new H3GeoFence();
-            GCHandle arrHandle = GCHandle.Alloc(h3Coords.ToArray(), GCHandleType.Pinned);
-            List<ulong> validIndexes = new List<ulong>();
-            try
-            {
-                polygon.geofence.verts = arrHandle.AddrOfPinnedObject();
-                polygon.geofence.numVerts = h3Coords.Length;
-                polygon.numHoles = 0;
-                polygon.holes = IntPtr.Zero;
-                index = new ulong[nbIndex+1];
-                Console.Write("{0}", nbIndex );
-                polyfill(ref polygon, resolution, index);
-
-                for (int i = 0; i < index.Length; i++)
-                {
-                    if (index[i] != 0)
-                    {
-                        validIndexes.Add(index[i]);
-                    }
-                }
-                Console.WriteLine(" --> {0}", validIndexes.Count );
-            }
-            finally
-            {
-                arrHandle.Free();
-            }
-            return validIndexes.ToArray();
-        }
-
-        private static int MaxPolyfillSize( List<GeoCoord> coords,  int resolution)
-        {
-            var h3Coords = FromGeoCoords(coords);
-            int nbIndex = 0;
-            H3GeoPolygon polygon = new H3GeoPolygon();
-            polygon.geofence = new H3GeoFence();
-            GCHandle arrHandle = GCHandle.Alloc(h3Coords.ToArray(), GCHandleType.Pinned);
-            try
-            {
-                polygon.geofence.verts = arrHandle.AddrOfPinnedObject();
-                polygon.geofence.numVerts = h3Coords.Length;
-                polygon.numHoles = 0;
-                polygon.holes = IntPtr.Zero;
-                nbIndex = maxPolyfillSize(ref polygon, resolution);
-            }
-            finally
-            {
-                arrHandle.Free();
-            }
-            return nbIndex;
-        }
-
-        public static ulong[] Compact( ulong[] h3Set )
-        {
-            ulong[] compactedSet = new ulong[h3Set.Length];
-            compact(h3Set, compactedSet, h3Set.Length);
-            return compactedSet;
-        }
-
-        public static ulong[] Uncompact( ulong[] compactedSet, int resolution  )
-        {
-            int maxHexes = maxUncompactSize(compactedSet, compactedSet.Length, resolution);
-            ulong[] h3Set = new ulong[maxHexes];
-            uncompact(compactedSet, compactedSet.Length, h3Set, maxHexes, resolution);
-            return h3Set;
-        }
-
-        public static double DegToRad(double deg)
-        {
-            return deg * Math.PI / 180;
-        }
-
-        public static double RadToDeg(double rad)
-        {
-            var val = rad * 180 / Math.PI;
-            if (val > 180) val = val - 360;
-            return val;
-        }
-
-        private static H3GeoCoord[] FromGeoCoords(List<GeoCoord> coords)
-        {
-            var h3GeoCoords = new List<H3GeoCoord>();
-            foreach (var g in coords)
-            {
-                h3GeoCoords.Add(new H3GeoCoord(g));
-            }
-            return h3GeoCoords.ToArray();
-        }
-
-        private static GeoCoord[] FromH3GeoCoords(H3GeoCoord[] h3Coords)
-        {
-            var geoCoords = new List<GeoCoord>();
-            foreach (var g in h3Coords)
-            {
-                geoCoords.Add(new GeoCoord(g));
-            }
-            return geoCoords.ToArray();
         }
 
         public static Boundaries GetBoundaries(string key)
@@ -494,6 +286,357 @@ namespace H3Standard
             return boundaries;
         }
 
+
+        // INSPECTION
+
+        public static int GetResolution(string h3)
+        {
+            return h3GetResolution(StringToH3(h3));
+        }
+
+        public static int GetResolution(ulong h3)
+        {
+            return h3GetResolution(h3);
+        }
+
+        public static int GetBaseCell(ulong h3)
+        {
+            return h3GetBaseCell(h3);
+        }
+
+        public static ulong StringToH3(string index)
+        {
+            return Convert.ToUInt64(index, 16);
+        }
+
+        public static string H3ToString(ulong index)
+        {
+            return string.Format("{0}", index.ToString("x"));
+        }
+
+        public static int IsValid(ulong h)
+        {
+            return h3IsValid(h);
+        }
+
+        public static bool IsResClassIII(ulong h)
+        {
+            return h3IsResClassIII(h) != 0;
+        }
+
+        public static bool IsPentagon(ulong h)
+        {
+            return h3IsPentagon(h) != 0;
+        }
+
+        public static int[] GetFaces(ulong h)
+        {
+            int n = maxFaceCount(h);
+            int[] faces = new int[n];
+            h3GetFaces(h, faces);
+            return faces;
+        }
+
+        // maxFaceCount: utility function for c
+
+        // TRAVERSAL
+
+        public static ulong[] GetKRing(ulong origin, int k)
+        {
+            int nbHex = maxKringSize(k);
+            ulong[] neighbours = new ulong[nbHex];
+            int result = hexRange(origin, k, neighbours);
+            return neighbours;
+        }
+
+        // maxKringSize : utility function for c
+
+        /// <summary>
+        /// Returns an array of array of h3Indexes by distance from the origin
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="k"></param>
+        /// <returns>An array of array of h3Indexes by distance from the origin</returns>
+        public static ulong[][] GetKRingDistances(ulong origin, int k)
+        {
+            int n = maxKringSize(k);
+            var neighbors = new List<ulong>[k+1];
+            for (var i = 0; i < neighbors.Length; i++)
+            {
+                neighbors[i] = new List<ulong>();
+            }
+            int[] distances = new int[n];
+            var h3Neighbors = new ulong[n];
+            kRingDistances(origin, k, h3Neighbors, distances);
+            int currentDistance = distances[0];
+            for (int i = 0; i < h3Neighbors.Length; i++)
+            {
+                if (distances[i] != currentDistance)
+                {
+                    currentDistance = distances[i];
+                }
+                if (h3Neighbors[i] != 0)
+                {
+                    neighbors[currentDistance].Add( h3Neighbors[i] );
+                }
+            }
+            return neighbors.Select( (arr) => { return arr.ToArray(); } ).ToArray();
+        }
+
+        public static ulong[] GetHexRange(ulong origin, int k)
+        {
+            int nbHex = maxKringSize(k);
+            ulong[] neighbours = new ulong[nbHex];
+            hexRange(origin, k, neighbours);
+            return neighbours;
+        }
+
+        // TODO: hexRangeDistances
+
+        // TODO: hexRanges
+
+        public static ulong[] GetHexRing(ulong origin, int k)
+        {
+            int nbHex = maxKringSize(k);
+            ulong[] neighbours = new ulong[nbHex];
+            int result = hexRing(origin, k, neighbours);
+            return neighbours;
+        }
+
+        public static ulong[] GetLine(ulong start, ulong end)
+        {
+            int d = h3LineSize(start, end);
+            ulong[] line = new ulong[d];
+            h3Line(start, end, line);
+            return line;
+        }
+
+        // h3LineSize : utility function for c
+
+        public static int H3Distance(ulong origin, ulong index)
+        {
+            return h3Distance(origin, index);
+        }
+
+        public static int H3Distance(string origin, string index)
+        {
+            return H3Distance(StringToH3(origin), StringToH3(index));
+        }
+
+        // TODO: experimentalH3ToLocalIj
+
+        // TODO: experimentalLocalIjToH3
+
+
+        // HIERARCHY
+
+        public static ulong H3ToParent(ulong index, int parentResolution = 0)
+        {
+            if (parentResolution == 0)
+            {
+                parentResolution = GetResolution(index) - 1;
+            }
+            return h3ToParent(index, parentResolution);
+        }
+
+        public static ulong H3ToParent(string index, int parentResolution = 0)
+        {
+            return H3ToParent(StringToH3(index), parentResolution);
+        }
+
+        public static ulong[] GetChildren(string hexIndex, int childResolution)
+        {
+            return GetChildren(StringToH3(hexIndex), childResolution);
+        }
+
+        public static ulong[] GetChildren(ulong index, int childResolution = 0)
+        {
+            ulong[] children = null;
+            if (childResolution == 0)
+            {
+                childResolution = GetResolution(index) + 1;
+            }
+            int nbChildren = maxH3ToChildrenSize(index, childResolution);
+            children = new ulong[nbChildren + 1];
+            h3ToChildren(index, childResolution, children);
+            return children;
+        }
+
+        // maxH3ToChildrenSize: utility function for c
+
+        public static (double latitude, double longitude) GetCenter(ulong index)
+        {
+            H3GeoCoord geoCoord = new H3GeoCoord();
+            h3ToGeo(index, ref geoCoord);
+            if (geoCoord.lon > 180) geoCoord.lon -= 360;
+            GeoCoord coords = new GeoCoord(geoCoord);
+            return (coords.latitude, coords.longitude);
+        }
+
+        public static ulong[] Compact(ulong[] h3Set)
+        {
+            ulong[] compactedSet = new ulong[h3Set.Length];
+            compact(h3Set, compactedSet, h3Set.Length);
+            return compactedSet;
+        }
+
+        public static ulong[] Uncompact(ulong[] compactedSet, int resolution)
+        {
+            int maxHexes = maxUncompactSize(compactedSet, compactedSet.Length, resolution);
+            ulong[] h3Set = new ulong[maxHexes];
+            uncompact(compactedSet, compactedSet.Length, h3Set, maxHexes, resolution);
+            return h3Set;
+        }
+
+        // maxUncompactSize: utility function for c
+
+        // REGIONS
+
+        public static ulong[] Polyfill(List<GeoCoord> coords, int resolution)
+        {
+            ulong[] index = null;
+            int nbIndex = MaxPolyfillSize(coords, resolution);
+            var h3Coords = FromGeoCoords(coords);
+            H3GeoPolygon polygon = new H3GeoPolygon();
+            polygon.geofence = new H3GeoFence();
+            GCHandle arrHandle = GCHandle.Alloc(h3Coords.ToArray(), GCHandleType.Pinned);
+            List<ulong> validIndexes = new List<ulong>();
+            try
+            {
+                polygon.geofence.verts = arrHandle.AddrOfPinnedObject();
+                polygon.geofence.numVerts = h3Coords.Length;
+                polygon.numHoles = 0;
+                polygon.holes = IntPtr.Zero;
+                index = new ulong[nbIndex + 1];
+                //Console.Write("{0}", nbIndex);
+                polyfill(ref polygon, resolution, index);
+                for (int i = 0; i < index.Length; i++)
+                {
+                    if (index[i] != 0)
+                    {
+                        validIndexes.Add(index[i]);
+                    }
+                }
+                //Console.WriteLine(" --> {0}", validIndexes.Count);
+            }
+            finally
+            {
+                arrHandle.Free();
+            }
+            return validIndexes.ToArray();
+        }
+
+        private static int MaxPolyfillSize(List<GeoCoord> coords, int resolution)
+        {
+            var h3Coords = FromGeoCoords(coords);
+            int nbIndex = 0;
+            H3GeoPolygon polygon = new H3GeoPolygon();
+            polygon.geofence = new H3GeoFence();
+            GCHandle arrHandle = GCHandle.Alloc(h3Coords.ToArray(), GCHandleType.Pinned);
+            try
+            {
+                polygon.geofence.verts = arrHandle.AddrOfPinnedObject();
+                polygon.geofence.numVerts = h3Coords.Length;
+                polygon.numHoles = 0;
+                polygon.holes = IntPtr.Zero;
+                nbIndex = maxPolyfillSize(ref polygon, resolution);
+            }
+            finally
+            {
+                arrHandle.Free();
+            }
+            return nbIndex;
+        }
+
+        // TODO: h3SetToLinkedGeo / h3SetToMultiPolygon
+
+        // TODO: destroyLinkedPolygon
+
+        // UNIDIRECTIONAL EDGES
+
+        public static bool AreNeighbors(ulong origin, ulong destination)
+        {
+            return h3IndexesAreNeighbors(origin, destination) == 1;
+        }
+
+        public static ulong GetEdge(ulong origin, ulong destination)
+        {
+            return getH3UnidirectionalEdge(origin, destination);
+        }
+
+        public static bool IsValidEdge(ulong edge)
+        {
+            return h3UnidirectionalEdgeIsValid(edge) == 1;
+        }
+
+        public static ulong GetOrigin(ulong edge)
+        {
+            return getOriginH3IndexFromUnidirectionalEdge(edge);
+        }
+
+        public static ulong GetDestination(ulong edge)
+        {
+            return getDestinationH3IndexFromUnidirectionalEdge(edge);
+        }
+
+        // Needs System.ValueTuple to compile --> Nuget
+        public static (ulong origin, ulong destination) GetOriginAndDestination(ulong edgeIndex)
+        {
+            ulong[] indexes = new ulong[2];
+            getH3IndexesFromUnidirectionalEdge(edgeIndex, indexes);
+            return (indexes[0], indexes[1]);
+        }
+
+        public static ulong[] GetEdges(ulong h3Index)
+        {
+            ulong[] edges = new ulong[6];
+            getH3UnidirectionalEdgesFromHexagon(h3Index, edges);
+            return edges;
+        }
+
+        public static H3GeoBoundary[] GetEdgeBoundary(ulong index)
+        {
+            var boundaries = new H3GeoBoundary[2];
+            getH3UnidirectionalEdgeBoundary(index, boundaries);
+            return boundaries;
+        }
+
+        // MISCELLANEOUS
+
+        public static double DegToRad(double deg)
+        {
+            return deg * Math.PI / 180;
+        }
+
+        public static double RadToDeg(double rad)
+        {
+            var val = rad * 180 / Math.PI;
+            if (val > 180) val = val - 360;
+            return val;
+        }
+
+        #endregion
+
+        #region Private utility methods
+        private static H3GeoCoord[] FromGeoCoords(List<GeoCoord> coords)
+        {
+            var h3GeoCoords = new List<H3GeoCoord>();
+            foreach (var g in coords)
+            {
+                h3GeoCoords.Add(new H3GeoCoord(g));
+            }
+            return h3GeoCoords.ToArray();
+        }
+
+        private static GeoCoord[] FromH3GeoCoords(H3GeoCoord[] h3Coords)
+        {
+            var geoCoords = new List<GeoCoord>();
+            foreach (var g in h3Coords)
+            {
+                geoCoords.Add(new GeoCoord(g));
+            }
+            return geoCoords.ToArray();
+        }
 
         private static GeoCoord[] Normalize(H3GeoBoundary geoBoundary)
         {
@@ -560,7 +703,7 @@ namespace H3Standard
             }
             return geoCoords.ToArray();
         }
-
-    }
+        #endregion
+    }   
 
 }
