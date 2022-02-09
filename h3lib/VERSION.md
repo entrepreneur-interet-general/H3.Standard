@@ -1,1 +1,0 @@
-Uber H3 C library version 3.2.0
