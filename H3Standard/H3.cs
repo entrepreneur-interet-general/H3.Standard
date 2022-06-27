@@ -40,8 +40,8 @@ namespace H3Standard
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
         public static extern ulong geoToH3(ref H3GeoCoord g, int res);
 
-        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl )]
-        public static extern void h3ToGeo( ulong h3, ref H3GeoCoord g);
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void h3ToGeo(ulong h3, ref H3GeoCoord g);
 
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
         public static extern void h3ToGeoBoundary(ulong h3, ref H3GeoBoundary gp);
@@ -119,16 +119,19 @@ namespace H3Standard
         public static extern void h3ToChildren(ulong h, int childRes, ulong[] children);
 
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong h3ToCenterChild(ulong h, int childRes);
+
+        [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
         public static extern int maxH3ToChildrenSize(ulong h, int childRes);
 
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
         public static extern int compact(ulong[] h3Set, ulong[] compactedSet, int numHexes);
 
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int uncompact(ulong[] compactedSet, int numHexes, ulong[] h3Set, int maxHexes, int res );
+        public static extern int uncompact(ulong[] compactedSet, int numHexes, ulong[] h3Set, int maxHexes, int res);
 
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int maxUncompactSize( ulong[] compactedSet, int numHexes, int res);
+        public static extern int maxUncompactSize(ulong[] compactedSet, int numHexes, int res);
 
 
         // REGION : https://uber.github.io/h3/#/documentation/api-reference/regions, https://h3geo.org/docs/api/regions
@@ -248,7 +251,7 @@ namespace H3Standard
         {
             H3GeoCoord geoCoord = new H3GeoCoord();
             h3ToGeo(h, ref geoCoord);
-            return new GeoCoord( geoCoord );
+            return new GeoCoord(geoCoord);
         }
 
         public static GeoCoord[] H3ToGeoBoundary(string key)
@@ -289,11 +292,6 @@ namespace H3Standard
 
         // INSPECTION
 
-        public static int GetResolution(string h3)
-        {
-            return h3GetResolution(StringToH3(h3));
-        }
-
         public static int GetResolution(ulong h3)
         {
             return h3GetResolution(h3);
@@ -314,9 +312,9 @@ namespace H3Standard
             return string.Format("{0}", index.ToString("x"));
         }
 
-        public static int IsValid(ulong h)
+        public static bool IsValid(ulong h)
         {
-            return h3IsValid(h);
+            return h3IsValid(h) == 1;
         }
 
         public static bool IsResClassIII(ulong h)
@@ -360,7 +358,7 @@ namespace H3Standard
         public static ulong[][] GetKRingDistances(ulong origin, int k)
         {
             int n = maxKringSize(k);
-            var neighbors = new List<ulong>[k+1];
+            var neighbors = new List<ulong>[k + 1];
             for (var i = 0; i < neighbors.Length; i++)
             {
                 neighbors[i] = new List<ulong>();
@@ -377,10 +375,10 @@ namespace H3Standard
                 }
                 if (h3Neighbors[i] != 0)
                 {
-                    neighbors[currentDistance].Add( h3Neighbors[i] );
+                    neighbors[currentDistance].Add(h3Neighbors[i]);
                 }
             }
-            return neighbors.Select( (arr) => { return arr.ToArray(); } ).ToArray();
+            return neighbors.Select((arr) => { return arr.ToArray(); }).ToArray();
         }
 
         public static ulong[] GetHexRange(ulong origin, int k)
@@ -430,29 +428,19 @@ namespace H3Standard
 
         // HIERARCHY
 
-        public static ulong H3ToParent(ulong index, int parentResolution = 0)
+        public static H3Index H3ToParent(ulong index, int parentResolution = -1)
         {
-            if (parentResolution == 0)
+            if (parentResolution == -1)
             {
                 parentResolution = GetResolution(index) - 1;
             }
-            return h3ToParent(index, parentResolution);
+            return new H3Index(h3ToParent(index, parentResolution));
         }
 
-        public static ulong H3ToParent(string index, int parentResolution = 0)
-        {
-            return H3ToParent(StringToH3(index), parentResolution);
-        }
-
-        public static ulong[] GetChildren(string hexIndex, int childResolution)
-        {
-            return GetChildren(StringToH3(hexIndex), childResolution);
-        }
-
-        public static ulong[] GetChildren(ulong index, int childResolution = 0)
+        public static ulong[] GetChildren(ulong index, int childResolution = -1)
         {
             ulong[] children = null;
-            if (childResolution == 0)
+            if (childResolution == -1)
             {
                 childResolution = GetResolution(index) + 1;
             }
@@ -460,6 +448,15 @@ namespace H3Standard
             children = new ulong[nbChildren + 1];
             h3ToChildren(index, childResolution, children);
             return children;
+        }
+
+        public static ulong CenterChild(ulong index, int childResolution = -1)
+        {
+            if (childResolution == -1)
+            {
+                childResolution = GetResolution(index) + 1;
+            }
+            return h3ToCenterChild(index, childResolution);
         }
 
         // maxH3ToChildrenSize: utility function for c
@@ -492,7 +489,7 @@ namespace H3Standard
 
         // REGIONS
 
-        public static ulong[] Polyfill(List<GeoCoord> coords, int resolution)
+        public static H3Index[] Polyfill(List<GeoCoord> coords, int resolution)
         {
             ulong[] index = null;
             int nbIndex = MaxPolyfillSize(coords, resolution);
@@ -523,7 +520,7 @@ namespace H3Standard
             {
                 arrHandle.Free();
             }
-            return validIndexes.ToArray();
+            return validIndexes.Select((ulong h3Index) => { return new H3Index(h3Index); }).ToArray();
         }
 
         private static int MaxPolyfillSize(List<GeoCoord> coords, int resolution)
@@ -580,11 +577,11 @@ namespace H3Standard
         }
 
         // Needs System.ValueTuple to compile --> Nuget
-        public static (ulong origin, ulong destination) GetOriginAndDestination(ulong edgeIndex)
+        public static (H3Index origin, H3Index destination) GetOriginAndDestination(ulong edgeIndex)
         {
             ulong[] indexes = new ulong[2];
             getH3IndexesFromUnidirectionalEdge(edgeIndex, indexes);
-            return (indexes[0], indexes[1]);
+            return (new H3Index(indexes[0]), new H3Index(indexes[1]));
         }
 
         public static ulong[] GetEdges(ulong h3Index)
@@ -613,6 +610,16 @@ namespace H3Standard
             var val = rad * 180 / Math.PI;
             if (val > 180) val = val - 360;
             return val;
+        }
+
+        public static ulong[] Res0Indexes
+        {
+            get
+            {
+                ulong[] res0Indexes = new ulong[122];
+                getRes0Indexes(res0Indexes);
+                return res0Indexes;
+            }
         }
 
         #endregion
