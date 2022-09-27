@@ -19,6 +19,11 @@ namespace H3Standard
             this._h3Index = h3Index;
         }
 
+        public H3Index(string h3Index)
+        {
+            this._h3Index = H3.StringToH3(h3Index);
+        }
+
         public ulong Value
         {
             get { return _h3Index; }
