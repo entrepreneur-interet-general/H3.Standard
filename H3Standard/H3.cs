@@ -343,7 +343,7 @@ namespace H3Standard
         {
             int nbHex = maxKringSize(k);
             ulong[] neighbours = new ulong[nbHex];
-            int result = hexRange(origin, k, neighbours);
+            kRing(origin, k, neighbours);
             return neighbours;
         }
 
