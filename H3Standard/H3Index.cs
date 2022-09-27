@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -66,13 +67,27 @@ namespace H3Standard
         {
             get
             {
-                return H3.GetFaces(this._h3Index);
+                var faces = H3.GetFaces(this._h3Index);
+                var filteredFaces = faces.Where(f => f != -1).ToArray();
+                return filteredFaces;
             }
         }
 
-        public ulong[] Neighbors
+        public H3Index[] Neighbors
         {
-            get { return H3.GetKRing(this._h3Index, 1); }
+            get
+            {
+                var neighbors = H3.GetKRing(this._h3Index, 1).ToArray();
+                var filteredNeighbors = new List<H3Index>();
+                foreach (H3Index neighbor in neighbors)
+                {
+                    if (neighbor != 0 && neighbor != this._h3Index )
+                    {
+                        filteredNeighbors.Add(neighbor);
+                    }
+                }
+                return filteredNeighbors.ToArray();
+            }
         }
 
         public ulong BaseCell
@@ -105,6 +120,11 @@ namespace H3Standard
             return (H3Index)H3.H3ToParent(this._h3Index, resolution);
         }
 
+        public H3Index CenterChild(int resolution)
+        {
+            return (H3Index)H3.CenterChild(this._h3Index, resolution);
+        }
+
         public List<H3Index> Children(int resolution)
         {
             return H3.GetChildren(this._h3Index, resolution).Select(h => { return (H3Index)h; }).ToList<H3Index>();
@@ -113,7 +133,16 @@ namespace H3Standard
         public List<H3Index> Edges
         {
             get {
-                return H3.GetEdges(this._h3Index).Select(h => { return (H3Index)h; }).ToList<H3Index>();
+                var edges = H3.GetEdges(this._h3Index).Select(h => { return (H3Index)h; }).ToList<H3Index>();
+                var filteredEdges = new List<H3Index>();
+                foreach (H3Index edge in edges)
+                {
+                    if (edge != 0 )
+                    {
+                        filteredEdges.Add(edge);
+                    }
+                }
+                return filteredEdges;
             }
         }
 
@@ -181,7 +210,7 @@ namespace H3Standard
                 return throughAntiMeridian;
             }
         }
-
+        
         public string BoundariesWKT
         {
             get {
@@ -217,9 +246,7 @@ namespace H3Standard
                     {
                         sb.Append(",");
                     }
-                    var lon = throughAntiMeridian ?
-                        boundary[1] < -120 ? boundary[1] + 360 : boundary[1] :
-                        boundary[1];
+                    var lon = throughAntiMeridian && boundary[1] < -120 ? boundary[1] + 360 : boundary[1];
                     sb.Append(lon + " " + boundary[0]);
                 }
                 sb.Append("))");
@@ -227,9 +254,59 @@ namespace H3Standard
             }
         }
 
+        public string EdgeWKT
+        {
+            get {
+                if (IsEdge)
+                {
+                    var origin = this.Origin;
+                    var destination = this.Destination;
+                    (var originLatitude, var originLongitude) = origin.Value.Center;
+                    (var destinationLatitude, var destinationLongitude ) = destination.Value.Center;
+                    if(originLongitude < -120 && destinationLongitude > 120)
+                    {
+                        originLongitude += 360;
+                    }
+                    else if (originLongitude > 120 && destinationLongitude < -120)
+                    {
+                        destinationLongitude += 360;
+                    }
+                    var sb = new StringBuilder();
+                    sb.Append("LINESTRING( ");
+                    sb.Append(originLongitude);
+                    sb.Append(" ");
+                    sb.Append(originLatitude);
+                    sb.Append(",");
+                    sb.Append(destinationLongitude);
+                    sb.Append(" ");
+                    sb.Append(destinationLatitude);
+                    sb.Append(" )");
+                    return sb.ToString();
+                }
+                return null;
+            }
+        }
+
         public bool IsNeighborWith(H3Index h3Index)
         {
             return H3.AreNeighbors(this._h3Index, h3Index);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            if (obj is H3Index)
+            {
+                return this._h3Index == ((H3Index)obj)._h3Index;
+            }
+            if (obj is ulong)
+            {
+                return this._h3Index == (ulong)obj;
+            }
+            return base.Equals(obj);
         }
 
         public bool Equals(H3Index other)
@@ -260,6 +337,11 @@ namespace H3Standard
         public static implicit operator ulong(H3Index h) => h._h3Index;
         public static implicit operator string(H3Index h) => H3.H3ToString(h._h3Index);
         public static explicit operator H3Index(ulong h) => new H3Index(h);
+
+        public override int GetHashCode()
+        {
+            return _h3Index.GetHashCode();
+        }
     }
 
 }
