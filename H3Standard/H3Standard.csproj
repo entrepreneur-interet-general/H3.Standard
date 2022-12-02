@@ -20,11 +20,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="H3LibInstanciate.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="h3lib.dll" />
   </ItemGroup>
-
   <ItemGroup>
-    <Compile Remove="H3LibInstanciate.cs" />
+    <Content Include="h3lib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 	<Import Project="H3.3.2.0.targets" Condition="Exists('H3.3.2.0.targets')" />
 
