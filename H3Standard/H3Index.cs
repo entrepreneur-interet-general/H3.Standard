@@ -14,6 +14,11 @@ namespace H3Standard
         internal static readonly int H3_DIGIT_OFFSET = 3;
         internal static readonly ulong H3_DIGIT_MASK = 7;
 
+        public H3Index(double lat, double lon, int resolution )
+        {
+            this._h3Index = H3.GeoToH3(lat, lon, resolution);
+        }
+
         public H3Index(ulong h3Index)
         {
             this._h3Index = h3Index;
