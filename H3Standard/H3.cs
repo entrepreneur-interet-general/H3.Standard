@@ -404,9 +404,13 @@ namespace H3Standard
         public static ulong[] GetLine(ulong start, ulong end)
         {
             int d = h3LineSize(start, end);
-            ulong[] line = new ulong[d];
-            h3Line(start, end, line);
-            return line;
+            if (d != -1)
+            {
+                ulong[] line = new ulong[d];
+                h3Line(start, end, line);
+                return line;
+            }
+            return new ulong[] { };
         }
 
         // h3LineSize : utility function for c
