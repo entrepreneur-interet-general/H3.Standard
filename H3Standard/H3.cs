@@ -119,7 +119,7 @@ namespace H3Standard
 
         // H3Error gridRingUnsafe(H3Index origin, int k, H3Index* out);
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-        public static extern /* H3Error */ uint gridRingUnsafe(ulong[] h3Set, int length, int k, ulong[] h3Indices);
+        public static extern /* H3Error */ uint gridRingUnsafe(ulong origin, int k, ulong[] h3Indices);
 
         // H3Error gridPathCells(H3Index start, H3Index end, H3Index* out);
         [DllImport(LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]

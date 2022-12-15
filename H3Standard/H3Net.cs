@@ -192,12 +192,6 @@ namespace H3Standard
             return neighbors.Select((arr) => { return arr.ToArray(); }).ToArray();
         }
 
-        [Obsolete("Use GridDiskDistances instead")]
-        public static ulong[][] GetKRingDistances(ulong origin, int k)
-        {
-            return GridDiskDistances(origin, k);
-        }
-
         public static ulong[] GridDiskUnsafe(ulong origin, int k)
         {
             long nbHex = 0;
@@ -207,10 +201,88 @@ namespace H3Standard
             return neighbours;
         }
 
+        [Obsolete("Use GridDiskDistances instead")]
+        public static ulong[][] GetKRingDistances(ulong origin, int k)
+        {
+            return GridDiskDistances(origin, k);
+        }
+
+        public static ulong[][] GridDiskDistancesUnsafe(ulong origin, int k)
+        {
+            long n = 0;
+            var error = H3.maxGridDiskSize(k, ref n);
+            var neighbors = new List<ulong>[k + 1];
+            for (var i = 0; i < neighbors.Length; i++)
+            {
+                neighbors[i] = new List<ulong>();
+            }
+            int[] distances = new int[n];
+            var h3Neighbors = new ulong[n];
+            error = H3.gridDiskDistancesUnsafe(origin, k, h3Neighbors, distances);
+            int currentDistance = distances[0];
+            for (int i = 0; i < h3Neighbors.Length; i++)
+            {
+                if (distances[i] != currentDistance)
+                {
+                    currentDistance = distances[i];
+                }
+                if (h3Neighbors[i] != 0)
+                {
+                    neighbors[currentDistance].Add(h3Neighbors[i]);
+                }
+            }
+            return neighbors.Select((arr) => { return arr.ToArray(); }).ToArray();
+        }
+
+        public static ulong[] GridDisksUnsafe(ulong[] h3Set, int k)
+        {
+            long nbHex = 0;
+            var error = H3.maxGridDiskSize(k, ref nbHex);
+            ulong[] neighbours = new ulong[nbHex];
+            error = H3.gridDisksUnsafe(h3Set, (int)nbHex, k, neighbours);
+            return neighbours;
+        }
+
+        public static ulong[][] GridDiskDistancesSafe(ulong origin, int k)
+        {
+            long n = 0;
+            var error = H3.maxGridDiskSize(k, ref n);
+            var neighbors = new List<ulong>[k + 1];
+            for (var i = 0; i < neighbors.Length; i++)
+            {
+                neighbors[i] = new List<ulong>();
+            }
+            int[] distances = new int[n];
+            var h3Neighbors = new ulong[n];
+            error = H3.gridDiskDistancesSafe(origin, k, h3Neighbors, distances);
+            int currentDistance = distances[0];
+            for (int i = 0; i < h3Neighbors.Length; i++)
+            {
+                if (distances[i] != currentDistance)
+                {
+                    currentDistance = distances[i];
+                }
+                if (h3Neighbors[i] != 0)
+                {
+                    neighbors[currentDistance].Add(h3Neighbors[i]);
+                }
+            }
+            return neighbors.Select((arr) => { return arr.ToArray(); }).ToArray();
+        }
+
+        public static ulong[] GridRingUnsafe(ulong origin, int k)
+        {
+            long nbHex = 0;
+            var error = H3.maxGridDiskSize(k, ref nbHex);
+            ulong[] neighbours = new ulong[nbHex];
+            error = H3.gridRingUnsafe(origin,k, neighbours);
+            return neighbours;
+        }
+
         [Obsolete("Use GridDiskUnsafe instead")]
         public static ulong[] GetHexRange(ulong origin, int k)
         {
-            return GridDiskUnsafe(origin, k);
+            return GridRingUnsafe(origin, k);
         }
 
         public static ulong[] GridPathCells(ulong origin, ulong destination)
