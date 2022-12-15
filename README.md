@@ -8,7 +8,7 @@ Documentation of the C library is available at [https://uber.github.io/h3/](http
 
 ### Version
 
-Bindings to Uber C library version 4.0.0.0
+Bindings to Uber C library version 4.0.1
 
 This project does not embed the corresponding native c library.
 It has to be build and added separately.
@@ -18,7 +18,7 @@ It has to be build and added separately.
 
 A _WINDOWS pragma directive has been defined to target the right name for the underlying H3 c lib, h3 in case of *Nix platforms, h3.dll in case of Windows platforms.
 
-## H3 - 4.0.0.0 Support
+## H3 - 4.0.1 Support
 
 All H3 C functions are accessible via a simple wrapping, with the exact same c-style name (camel-casing).
 
