@@ -27,7 +27,7 @@ namespace H3Standard.Tests.H3Net
             ulong origin = 621923649824456703;
             int vertexNum = 1;
             ulong vertex = H3Standard.H3Net.CellToVertex(origin, vertexNum);
-            Assert.AreEqual(vertex, (UInt64)2639536282883522559);
+            Assert.AreEqual(vertex, (UInt64)2711593876921319423);
         }
 
         [TestMethod]
