@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 namespace H3Standard
 {
     public class CoordIJK
@@ -24,3 +23,4 @@ namespace H3Standard
         public int k;
     }
 }
+
