@@ -30,11 +30,13 @@ namespace H3Standard
         public double LatWGS84
         {
             get { return H3Net.RadToDeg(this.lat); }
+            set { this.lat = H3Net.DegToRad(value); }
         }
 
         public double LngWGS84
         {
             get { return H3Net.RadToDeg(this.lng); }
+            set { this.lng = H3Net.DegToRad(value); }
         }
 
         public LatLng(GeoCoord coord)
@@ -49,6 +51,11 @@ namespace H3Standard
             this.lng = H3Net.DegToRad(lng);
         }
 
+        /// <summary>
+        /// Builds a LatLng array from an array [lat,lng] of WGS84 coords
+        /// </summary>
+        /// <param name="coords"></param>
+        /// <returns></returns>
         public static LatLng[] FromDoubleArray(double[][] coords)
         {
             var latLngs = new List<LatLng>();
