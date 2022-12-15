@@ -14,18 +14,35 @@
  * limitations under the License.
  */
 
+namespace H3Standard {
+    public struct GeoCoord
+    {
+        public double lat;
+        public double lng;
 
-public struct H3GeoBoundary
-{
-    public int numVerts;        ///< number of vertices
-    public GeoCoord verts0;
-    public GeoCoord verts1;
-    public GeoCoord verts2;
-    public GeoCoord verts3;
-    public GeoCoord verts4;
-    public GeoCoord verts5;
-    public GeoCoord verts6;
-    public GeoCoord verts7;
-    public GeoCoord verts8;
-    public GeoCoord verts9;
+        public double LatWGS84
+        {
+            get { return H3Net.RadToDeg(lat); }
+        }
+
+        public double LngWGS84
+        {
+            get { return H3Net.RadToDeg(lng); }
+        }
+
+        public GeoCoord(double lat, double lon)
+        {
+            this.lat = lat;
+            this.lng = lon;
+        }
+
+        public GeoCoord(LatLng coord)
+        {
+            lat = H3Net.RadToDeg(coord.lat);
+            lng = H3Net.RadToDeg(coord.lng);
+        }
+    }
 }
+
+
+

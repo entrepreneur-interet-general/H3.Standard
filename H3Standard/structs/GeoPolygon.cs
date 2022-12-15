@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Shom, Arnaud Ménard
+ * Copyright 2018-2022 Shom, Swail, Arnaud Ménard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
+using System;
+using System.Runtime.InteropServices;
+using H3Standard;
 
-public struct GeoCoord
+namespace H3Standard
 {
-    public double latitude;
-    public double longitude;
-
-    public GeoCoord(double lat, double lon)
+    [StructLayout(LayoutKind.Sequential)]
+    public struct GeoPolygon
     {
-        latitude = lat;
-        longitude = lon;
+        public GeoLoop geoloop;     ///< exterior boundary of the polygon
+        public int numHoles;        ///< number of elements in the array pointed to by holes
+        public IntPtr holes;        // GeoCoord[] ///< interior boundaries (holes) in the polygon
     }
 
-    public GeoCoord(H3GeoCoord coord)
-    {
-        latitude = H3Standard.H3.RadToDeg(coord.lat);
-        longitude = H3Standard.H3.RadToDeg(coord.lon);
-    }
 }
+
 

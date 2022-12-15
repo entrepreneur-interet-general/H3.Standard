@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Shom, Arnaud Ménard
+ * Copyright 2018-2022 Shom, Swail, Arnaud Ménard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-
-using System.Runtime.InteropServices;
-
-[StructLayout(LayoutKind.Sequential)]
-public struct H3GeoCoord
+namespace H3Standard
 {
-    public double lat;  ///< latitude in radians
-    public double lon;  ///< longitude in radians
-
-    public H3GeoCoord(GeoCoord coord)
+    public struct CellBoundary
     {
-        lat = H3Standard.H3.DegToRad(coord.latitude);
-        lon = H3Standard.H3.DegToRad(coord.longitude);
+        public int numVerts;        ///< number of vertices
+        public LatLng verts0;
+        public LatLng verts1;
+        public LatLng verts2;
+        public LatLng verts3;
+        public LatLng verts4;
+        public LatLng verts5;
+        public LatLng verts6;
+        public LatLng verts7;
+        public LatLng verts8;
+        public LatLng verts9;
     }
 }
 

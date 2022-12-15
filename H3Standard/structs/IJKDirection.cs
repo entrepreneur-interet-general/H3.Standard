@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-
-public class H3LinkedGeoPolygon
+namespace H3Standard
 {
-    H3LinkedGeoLoop first;
-    H3LinkedGeoLoop last;
-    H3LinkedGeoPolygon next;
-};
+    public enum IjkDirection
+    {
+        c = 0,
+        k = 1,
+        j = 2,
+        jk = 3,
+        i = 4,
+        ik = 5,
+        ij = 6
+    }
+}
+

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Shom, Arnaud Ménard
+ * Copyright 2018-2022 - Shom, Swail, Arnaud Ménard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
+using System;
+using System.Runtime.InteropServices;
+
 namespace H3Standard
 {
-    public enum IjkDirection
+    [StructLayout(LayoutKind.Sequential)]
+    public struct GeoLoop
     {
-        c = 0,
-        k = 1,
-        j = 2,
-        jk = 3,
-        i = 4,
-        ik = 5,
-        ij = 6
+        public int numVerts;
+        public IntPtr verts;    // GeoCoord[]
     }
 }
+

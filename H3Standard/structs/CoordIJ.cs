@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Shom, Arnaud Ménard
+ * Copyright 2022, Swail, Arnaud Ménard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 using System;
+using System.Runtime.InteropServices;
 
-public struct H3GeoPolygon
+namespace H3Standard
 {
-    public H3GeoFence geofence;   ///< exterior boundary of the polygon
-    public int numHoles;        ///< number of elements in the array pointed to by holes
-    public IntPtr holes;        // GeoCoord[] ///< interior boundaries (holes) in the polygon
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CoordIJ
+    {
+        public int i;
+        public int j;
+
+    }
 }
+
 

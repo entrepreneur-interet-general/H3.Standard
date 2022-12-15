@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Shom, Arnaud Ménard
+ * Copyright 2018-2022 Shom, Swail, Arnaud Ménard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
 
-public struct H3GeoFence
-    
+using System;
+using System.Runtime.InteropServices;
+
+namespace H3Standard
 {
-    public int numVerts;
-    public IntPtr verts;    // GeoCoord[]
+    [StructLayout(LayoutKind.Sequential)]
+    public class LinkedGeoLoop
+    {
+        public LinkedGeoCoord first;
+        public LinkedGeoCoord last;
+        public IntPtr next;
+    }
 }
 

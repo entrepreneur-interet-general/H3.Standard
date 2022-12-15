@@ -21,10 +21,18 @@
 
   <ItemGroup>
     <None Remove="h3lib.dll" />
+    <None Remove="structs\" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="H3LibInstanciate.cs" />
+    <Compile Remove="H3Index.cs" />
+    <Compile Remove="H3Structs\CoordIJK.cs" />
+    <Compile Remove="H3Structs\Boundaries.cs" />
+    <Compile Remove="Boundaries.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="structs\" />
   </ItemGroup>
 	<Import Project="H3.3.2.0.targets" Condition="Exists('H3.3.2.0.targets')" />
 

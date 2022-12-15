@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Shom, Arnaud Ménard
+ * Copyright 2018-2022 Shom, Swail, Arnaud Ménard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,17 @@
  */
 
 
+using System;
+using System.Runtime.InteropServices;
 
-public class H3LinkedGeoCoord
+namespace H3Standard
 {
-    H3GeoCoord vertex;
-    H3LinkedGeoCoord next;
-};
+    [StructLayout(LayoutKind.Sequential)]
+    public class LinkedGeoCoord
+    {
+        public LatLng vertex;
+        public IntPtr next;
+    }
+}
+
 
