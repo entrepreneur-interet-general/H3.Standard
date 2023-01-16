@@ -5,14 +5,6 @@ VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H3Standard", "H3Standard\H3Standard.csproj", "{BA7B2458-1621-44FC-9C72-7283E92AA7F3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "h3lib", "h3lib\h3lib.vcxproj", "{9D74189C-BA8C-44FF-8B15-F0915C262C63}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36DFE2C6-28C7-4EC4-AD05-95D6DAB18ADD}"
-	ProjectSection(SolutionItems) = preProject
-		LICENCE.md = LICENCE.md
-		README.md = README.md
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H3Standard.H3.Tests", "H3.Standard.Tests\H3Standard.H3.Tests.csproj", "{54D5BBC8-4C3B-4E8E-AE7D-BE18247A1632}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H3Standard.H3Net.Tests", "H3.Standard.H3Net.Tests\H3Standard.H3Net.Tests.csproj", "{991AE17D-9C74-4598-8613-C9C0D90F4B3D}"
@@ -39,16 +31,6 @@ Global
 		{BA7B2458-1621-44FC-9C72-7283E92AA7F3}.Release|x64.Build.0 = Release|Any CPU
 		{BA7B2458-1621-44FC-9C72-7283E92AA7F3}.Release|x86.ActiveCfg = Release|Any CPU
 		{BA7B2458-1621-44FC-9C72-7283E92AA7F3}.Release|x86.Build.0 = Release|Any CPU
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Debug|x64.ActiveCfg = Debug|x64
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Debug|x64.Build.0 = Debug|x64
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Debug|x86.ActiveCfg = Debug|Win32
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Debug|x86.Build.0 = Debug|Win32
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Release|Any CPU.ActiveCfg = Release|Win32
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Release|x64.ActiveCfg = Release|x64
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Release|x64.Build.0 = Release|x64
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Release|x86.ActiveCfg = Release|Win32
-		{9D74189C-BA8C-44FF-8B15-F0915C262C63}.Release|x86.Build.0 = Release|Win32
 		{54D5BBC8-4C3B-4E8E-AE7D-BE18247A1632}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{54D5BBC8-4C3B-4E8E-AE7D-BE18247A1632}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54D5BBC8-4C3B-4E8E-AE7D-BE18247A1632}.Debug|x64.ActiveCfg = Debug|Any CPU
