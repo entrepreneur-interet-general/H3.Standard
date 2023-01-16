@@ -21,7 +21,7 @@ using System.Text;
 
 namespace H3Standard
 {
-    public struct H3Index : IEquatable<H3Index>, IEquatable<ulong>, IComparable<H3Index>
+    public class H3Index : IEquatable<H3Index>, IEquatable<ulong>, IComparable<H3Index>
     {
         private ulong _h3Index;
 
@@ -37,6 +37,11 @@ namespace H3Standard
         public H3Index(ulong h3Index)
         {
             this._h3Index = h3Index;
+        }
+
+        public H3Index(LatLng latLng, int resolution)
+        {
+            this._h3Index = H3Net.LatLngToCell(latLng, resolution);
         }
 
         public H3Index(string h3Index)
@@ -179,14 +184,14 @@ namespace H3Standard
             return H3Net.GridDistance(this._h3Index, destination);
         }
 
-        public H3Index ToParent(int resolution)
+        public H3Index Parent(int resolution = -1)
         {
             return (H3Index)H3Net.CellToParent(this._h3Index, resolution);
         }
 
-        public H3Index CenterChild(int resolution)
+        public H3Index CenterChild(int resolution = -1)
         {
-            if (resolution <= this.Resolution)
+            if (resolution != -1 && resolution <= this.Resolution)
             {
                 return (H3Index)0;
             }
@@ -195,7 +200,7 @@ namespace H3Standard
 
         public List<H3Index> Children(int resolution)
         {
-            if (resolution <= this.Resolution)
+            if (resolution <= this.Resolution || !this.IsValidCell)
             {
                 return null;
             }
@@ -268,7 +273,6 @@ namespace H3Standard
         {
             return (H3Index)H3Net.CellToVertex(this._h3Index, vertexNum);
         }
-
 
         public bool OverAntiMeridian
         {
@@ -349,8 +353,8 @@ namespace H3Standard
                 {
                     var origin = this.Origin;
                     var destination = this.Destination;
-                    var originLatLng = origin.Value.Center;
-                    var destinationLatLng = destination.Value.Center;
+                    var originLatLng = origin.Center;
+                    var destinationLatLng = destination.Center;
                     if (originLatLng.LngWGS84 < -120 && destinationLatLng.LngWGS84 > 120)
                     {
                         originLatLng.LngWGS84 += 360;
@@ -422,9 +426,14 @@ namespace H3Standard
             return h1.Value != h2.Value;
         }
 
+        public override string ToString()
+        {
+            return H3Net.H3ToString(this._h3Index);
+        }
+
         public static implicit operator ulong(H3Index h) => h._h3Index;
         public static implicit operator string(H3Index h) => H3Net.H3ToString(h._h3Index);
-        public static explicit operator H3Index(ulong h) => new H3Index(h);
+        public static implicit operator H3Index(ulong h) => new H3Index(h);
 
         public override int GetHashCode()
         {
