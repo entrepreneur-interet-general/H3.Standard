@@ -38,8 +38,8 @@ namespace H3Standard {
 
         public GeoCoord(LatLng coord)
         {
-            lat = H3Net.RadToDeg(coord.lat);
-            lng = H3Net.RadToDeg(coord.lng);
+            lat = coord.lat;
+            lng = coord.lng;
         }
     }
 }

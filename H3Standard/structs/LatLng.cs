@@ -39,12 +39,6 @@ namespace H3Standard
             set { this.lng = H3Net.DegToRad(value); }
         }
 
-        public LatLng(GeoCoord coord)
-        {
-            lat = H3Net.DegToRad(coord.lat);
-            lng = H3Net.DegToRad(coord.lng);
-        }
-
         public LatLng(double lat, double lng)
         {
             this.lat = H3Net.DegToRad(lat);
