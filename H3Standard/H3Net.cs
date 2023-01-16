@@ -378,7 +378,11 @@ namespace H3Standard
         {
             ulong[] compactedSet = new ulong[h3Set.Length];
             var error = H3.compactCells(h3Set, compactedSet, h3Set.Length);
-            return compactedSet;
+            if (error == 0)
+            {
+                return compactedSet.Where( h => h != 0 ).ToArray<ulong>();
+            }
+            return h3Set;
         }
         [Obsolete("Use Compact instead")]
         public static ulong[] Compact(ulong[] h3Set)
@@ -390,9 +394,13 @@ namespace H3Standard
         {
             long maxHexes = 0;
             var error = H3.uncompactCellsSize(compactedSet, compactedSet.Length, resolution, ref maxHexes);
-            ulong[] h3Set = new ulong[maxHexes];
-            H3.uncompactCells(compactedSet, compactedSet.Length, h3Set, maxHexes, resolution);
-            return h3Set;
+            if (error == 0)
+            {
+                ulong[] h3Set = new ulong[maxHexes];
+                error = H3.uncompactCells(compactedSet, compactedSet.Length, h3Set, maxHexes, resolution);
+                return h3Set;
+            }
+            return compactedSet;
         }
 
         [Obsolete("Use UncompactCells instead")]
@@ -405,10 +413,9 @@ namespace H3Standard
 
         #region REGIONS
 
-        public static ulong[] PolygonToCells(List<GeoCoord> coords, int resolution)
+        public static ulong[] PolygonToCells(List<LatLng> latLngs, int resolution, int limitNbIndex = -1 )
         {
             ulong[] indexes = null;
-            var latLngs = FromGeoCoords(coords);
             GeoPolygon polygon = new GeoPolygon();
             polygon.geoloop = new GeoLoop();
             GCHandle arrHandle = GCHandle.Alloc(latLngs.ToArray(), GCHandleType.Pinned);
@@ -416,19 +423,36 @@ namespace H3Standard
             try
             {
                 polygon.geoloop.verts = arrHandle.AddrOfPinnedObject();
-                polygon.geoloop.numVerts = latLngs.Length;
+                polygon.geoloop.numVerts = latLngs.Count;
                 polygon.numHoles = 0;
                 polygon.holes = IntPtr.Zero;
                 UInt32 flags = 0;
                 long nbIndex = 0;
                 var error = H3.maxPolygonToCellsSize(ref polygon, resolution, flags, ref nbIndex);
-                indexes = new ulong[nbIndex + 1];
-                H3.polygonToCells(ref polygon, resolution, flags, indexes);
-                for (int i = 0; i < indexes.Length; i++)
+                if (error == 0)
                 {
-                    if (indexes[i] != 0)
+                    if (limitNbIndex != -1)
                     {
-                        validIndexes.Add(indexes[i]);
+                        while (nbIndex > limitNbIndex && resolution > 0)
+                        {
+                            resolution--;
+                            error = H3.maxPolygonToCellsSize(ref polygon, resolution, flags, ref nbIndex);
+                        }
+                    }
+                    if (nbIndex > 0 )
+                    {
+                        indexes = new ulong[nbIndex + 1];
+                        error = H3.polygonToCells(ref polygon, resolution, flags, indexes);
+                        if (error == 0)
+                        {
+                            for (int i = 0; i < indexes.Length; i++)
+                            {
+                                if (indexes[i] != 0)
+                                {
+                                    validIndexes.Add(indexes[i]);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -440,7 +464,7 @@ namespace H3Standard
         }
 
         [Obsolete("Use PolygonToCells instead")]
-        public static ulong[] Polyfill(List<GeoCoord> coords, Int32 resolution)
+        public static ulong[] Polyfill(List<LatLng> coords, Int32 resolution)
         {
             return PolygonToCells(coords, resolution);
         }
@@ -470,9 +494,9 @@ namespace H3Standard
         }
 
         [Obsolete("Use CellsToDirectedEdge instead")]
-        public static long GetEdge(ulong origin, ulong destination)
+        public static ulong GetEdge(ulong origin, ulong destination)
         {
-            return GetEdge(origin, destination);
+            return CellsToDirectedEdge(origin, destination);
         }
 
         public static bool IsValidDirectedEdge(ulong edge)
@@ -618,16 +642,6 @@ namespace H3Standard
         #endregion
 
         #region Private utility methods
-        public static LatLng[] FromGeoCoords(List<GeoCoord> coords)
-        {
-            var h3GeoCoords = new List<LatLng>();
-            foreach (var g in coords)
-            {
-                h3GeoCoords.Add(new LatLng(g));
-            }
-            return h3GeoCoords.ToArray();
-        }
-
         private static LatLng[] Normalize(CellBoundary geoBoundary)
         {
             List<LatLng> geoCoords = new List<LatLng>();
