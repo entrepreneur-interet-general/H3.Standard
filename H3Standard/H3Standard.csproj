@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <Compile Remove="H3LibInstanciate.cs" />
-    <Compile Remove="H3Index.cs" />
     <Compile Remove="H3Structs\CoordIJK.cs" />
     <Compile Remove="H3Structs\Boundaries.cs" />
     <Compile Remove="Boundaries.cs" />
@@ -40,4 +39,10 @@
     <DefineConstants>_WINDOWS</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
 </Project>

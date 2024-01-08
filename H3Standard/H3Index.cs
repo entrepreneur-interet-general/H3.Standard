@@ -25,9 +25,21 @@ namespace H3Standard
     {
         private ulong _h3Index;
 
-        internal static readonly int MAX_H3_RES = 15;
-        internal static readonly int H3_DIGIT_OFFSET = 3;
+        internal static readonly UInt64 H3_INIT = 35184372088831;
+        internal static readonly int H3_BC_OFFSET = 45;
+        internal static readonly int H3_RES_OFFSET = 52;
+        internal static readonly int H3_MODE_OFFSET = 59;
         internal static readonly ulong H3_DIGIT_MASK = 7;
+        internal static readonly int H3_DIGIT_OFFSET = 3;
+        internal static readonly int H3_PER_DIGIT_OFFSET = 3;
+        internal static readonly int MAX_H3_RES = 15;
+
+        internal static readonly UInt64 H3_BC_MASK = ((UInt64)127 << H3_BC_OFFSET);
+        internal static readonly UInt64 H3_BC_MASK_NEGATIVE = (~H3_BC_MASK);
+        internal static readonly UInt64 H3_RES_MASK = ((UInt64)15 << H3_RES_OFFSET);
+        internal static readonly UInt64 H3_RES_MASK_NEGATIVE = (~H3_RES_MASK);
+        internal static readonly UInt64 H3_MODE_MASK = ((UInt64)15 << H3_MODE_OFFSET);
+        internal static readonly UInt64 H3_MODE_MASK_NEGATIVE = (~H3_MODE_MASK);
 
         public H3Index(double lat, double lon, int resolution)
         {
@@ -49,9 +61,31 @@ namespace H3Standard
             this._h3Index = H3Net.StringToH3(h3Index);
         }
 
+        public H3Index(int baseCellNumber, List<int> digits)
+        {
+            this._h3Index = H3_INIT;
+            SetMode(1);
+            SetResolution(digits.Count());
+            SetBaseCellNumber(baseCellNumber);
+            for (var i = 0; i < digits.Count(); i++)
+            {
+                SetIndexDigit(i+1, digits[i]);
+            }
+        }
+
         public ulong Value
         {
             get { return _h3Index; }
+        }
+
+        public bool HasValue
+        {
+            get { return _h3Index != 0 && IsValid; }
+        }
+
+        public bool IsValid
+        {
+            get { return IsValidCell || IsValidDirectedEdge || IsValidVertex; }
         }
 
         public int Resolution
@@ -60,6 +94,12 @@ namespace H3Standard
             {
                 return H3Net.GetResolution(this._h3Index);
             }
+        }
+
+        private void SetResolution(int res)
+        {
+            this._h3Index = (((this._h3Index) & H3_RES_MASK_NEGATIVE) |
+                (((UInt64)(res)) << H3_RES_OFFSET));
         }
 
         public bool IsValidCell
@@ -130,14 +170,40 @@ namespace H3Standard
             }
         }
 
+        private void SetMode(int mode)
+        {
+            this._h3Index = (((this._h3Index) & H3_MODE_MASK_NEGATIVE) | (((UInt64)(mode)) << H3_MODE_OFFSET));
+        }
+
         public ulong BaseCell
         {
             get { return H3Net.CellToParent(this._h3Index, 0); }
         }
 
+        public int BaseCellNumber
+        {
+            get
+            {
+                return H3Net.GetBaseCellNumber(this._h3Index);
+            }
+        }
+
+        private void SetBaseCellNumber(int baseCellNumber)
+        {
+            this._h3Index = ((this._h3Index & H3_BC_MASK_NEGATIVE) | (((UInt64)(baseCellNumber)) << H3_BC_OFFSET));
+        }
+
         public int GetIndexDigit(int resolution)
         {
             return (int)((this._h3Index >> ((MAX_H3_RES - resolution) * H3_DIGIT_OFFSET)) & H3_DIGIT_MASK);
+        }
+
+        public void SetIndexDigit(int res, int digit)
+        {
+            this._h3Index = (((this._h3Index) & ~((H3_DIGIT_MASK
+                       << ((MAX_H3_RES - (res)) * H3_PER_DIGIT_OFFSET)))) |
+            (((UInt64)(digit))
+             << ((MAX_H3_RES - (res)) * H3_PER_DIGIT_OFFSET)));
         }
 
         public List<H3Index> GridDisk(int k)
@@ -204,7 +270,10 @@ namespace H3Standard
             {
                 return null;
             }
-            return H3Net.CellToChildren(this._h3Index, resolution).Select(h => { return (H3Index)h; }).ToList<H3Index>();
+            return H3Net.CellToChildren(this._h3Index, resolution)
+                .Where(h => h != 0)
+                .Select(h => { return (H3Index)h; })
+                .ToList<H3Index>();
         }
 
         public List<H3Index> Edges
@@ -379,6 +448,19 @@ namespace H3Standard
             }
         }
 
+        public int[] HumanReadable
+        {
+            get {
+                var ints = new List<int>();
+                ints.Add(this.BaseCellNumber);
+                for (int i = 1; i <= Resolution; i++)
+                {
+                    ints.Add(GetIndexDigit(i));
+                }
+                return ints.ToArray();
+            }
+        }
+
         public bool IsNeighborWith(H3Index h3Index)
         {
             return H3Net.AreNeighborCells(this._h3Index, h3Index);
@@ -418,12 +500,13 @@ namespace H3Standard
 
         public static bool operator ==(H3Index h1, H3Index h2)
         {
-            return h1.Value == h2.Value;
+            return (h1 is null && h2 is null) || ( !(h1 is null) && !(h2 is null) && h1.Value == h2.Value);
         }
 
         public static bool operator !=(H3Index h1, H3Index h2)
         {
-            return h1.Value != h2.Value;
+            if (h1 is null && h2 is null) return false;
+            return ( (h1 is null && !(h2 is null) ) || ( h2 is null && !( h1 is null) ) ) || h1.Value != h2.Value;
         }
 
         public override string ToString()

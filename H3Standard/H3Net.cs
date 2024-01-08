@@ -156,7 +156,7 @@ namespace H3Standard
             H3.maxGridDiskSize(k, ref nbHex);
             ulong[] neighbours = new ulong[nbHex];
             H3.gridDisk(origin, k, neighbours);
-            return neighbours;
+            return neighbours.Where(n => n != 0).ToArray();
         }
 
         [Obsolete("Use GridDisk instead")]
@@ -348,7 +348,7 @@ namespace H3Standard
             var error = H3.cellToChildrenSize(index, childResolution, ref nbChildren);
             children = new ulong[nbChildren + 1];
             error = H3.cellToChildren(index, childResolution, children);
-            return children;
+            return children.Where(h => h != 0).ToArray();
         }
 
         [Obsolete("Use CellToChildren instead")]
